@@ -1,0 +1,144 @@
+import pygame
+import random
+
+# initiate pygame
+pygame.init()
+
+# define the colors
+white = (255, 255, 255)
+red = (255, 0, 0)
+green = (0, 255, 0)
+blue = (0, 0, 255)
+
+
+#introducing the user
+print("welcome to the 1d Cellular Automaton Matrix")
+print("You will be asked to determine the rules of the Automaton for every combination of 3 cells")
+print("for every combination of Dead and Alive cells, Type 'D' if the outcome should be dead or 'A' if it should be alive")
+
+#Asking the user to set the rules
+rule1 = input("Dead, Dead, Dead")
+rule2 = input("Alive, Alive, Alive")
+rule3 = input("Alive, Alive, Dead")
+rule4 = input("Alive, Dead, Alive")
+rule5 = input("Alive, Dead, Dead")
+rule6 = input("Dead, Alive, Alive")
+rule7 = input("Dead, Alive, Dead")
+rule8 = input("Dead, Dead, Alive")
+
+#Asking the user to set the first line
+beginning = []
+print("The first Line will be composed by 500 Dead cells. Note that not this is not enough for all rules to start life.")
+starting_line = input("type 'Y' if this is how you want to have it. Type 'N' if you want to have some life from the beginning")
+if starting_line == "Y":
+    beginning = [False] * 500
+
+if starting_line == "N":
+    alive_cells = input("insert how many living cell you want to randomly add")
+    beginning = [True] * int(alive_cells) + [False] * (500 - int(alive_cells))
+random.shuffle(beginning)
+
+
+#Asking the user to choose colors for the Automaton
+print("Great! now choose a color for the Alive cells and one for the Dead cells")
+print("Type 'W' for White, 'R' for Red, 'G' for Green, 'U' for Blue ")
+cell_color = input("what color should life be?")
+death_color = input("what color should dead cells be?")
+
+print("Great! now let's simulate life!")
+
+# creating the screen
+width = 500
+height = 500
+screen = pygame.display.set_mode((width, height))
+pygame.display.set_caption("1 Dimensional Cellular Automaton")
+
+#Setting variables necessary for the loop to work
+beginning_2 = [False]*500
+line = 0
+
+alive = True
+running = True
+
+#Main Loop
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+    if line == 500:
+        alive = False
+
+    #Automaton Loop
+    while alive:
+        for i in range(1, 499):
+            if beginning[i - 1] == False and beginning[i] == False and beginning[i+1] == False:
+                if rule1 == "D":
+                    beginning_2[i] = False
+                if rule1 == "A":
+                    beginning_2[i] = True
+            if beginning[i - 1] and beginning[i] and beginning[i+1]:
+                if rule2 == "D":
+                    beginning_2[i] = False
+                if rule2 == "A":
+                    beginning_2[i] = True
+            if beginning[i - 1] and beginning[i] and beginning[i+1] == False:
+                if rule3 == "D":
+                    beginning_2[i] = False
+                if rule3 == "A":
+                    beginning_2[i] = True
+            if beginning[i - 1] and beginning[i] == False and beginning[i+1]:
+                if rule4 == "D":
+                    beginning_2[i] = False
+                if rule4 == "A":
+                    beginning_2[i] = True
+            if beginning[i - 1] and beginning[i] == False and beginning[i+1] == False:
+                if rule5 == "D":
+                    beginning_2[i] = False
+                if rule5 == "A":
+                    beginning_2[i] = True
+            if beginning[i - 1] == False and beginning[i] and beginning[i+1]:
+                if rule6 == "D":
+                    beginning_2[i] = False
+                if rule6 == "A":
+                    beginning_2[i] = True
+            if beginning[i - 1] == False and beginning[i] and beginning[i+1] == False:
+                if rule7 == "D":
+                    beginning_2[i] = False
+                if rule7 == "A":
+                    beginning_2[i] = True
+            if beginning[i - 1] and beginning[i] and beginning[i+1] == False:
+                if rule8 == "D":
+                    beginning_2[i] = False
+                if rule8 == "A":
+                    beginning_2[i] = True
+
+        #Automaton Visualization
+        for i in range(0, 500):
+            if beginning_2[i]:
+                if cell_color == "W":
+                    pygame.draw.rect(screen, (white), ((i), (line), 1, 1))
+                if cell_color == "U":
+                    pygame.draw.rect(screen, (blue), ((i), (line), 1, 1))
+                if cell_color == "G":
+                    pygame.draw.rect(screen, (green), ((i), (line), 1, 1))
+                if cell_color == "R":
+                    pygame.draw.rect(screen, (red), ((i), (line), 1, 1))
+            if beginning_2[i] == False:
+                if death_color == "W":
+                    pygame.draw.rect(screen, (white), ((i), (line), 1, 1))
+                if death_color == "U":
+                    pygame.draw.rect(screen, (blue), ((i), (line), 1, 1))
+                if death_color == "G":
+                    pygame.draw.rect(screen, (green), ((i), (line), 1, 1))
+                if death_color == "R":
+                    pygame.draw.rect(screen, (red), ((i), (line), 1, 1))
+        pygame.display.update()
+
+        #Resetting the loop to start again
+        line = line + 1
+        beginning = beginning_2
+        beginning_2 = [False] * 500
+
+
+
+pygame.quit
