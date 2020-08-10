@@ -1,0 +1,213 @@
+import pygame
+import random
+import itertools
+
+# initiate pygame
+pygame.init()
+
+# define the colors
+white = (255, 255, 255)
+red = (255, 0, 0)
+green = (0, 255, 0)
+blue = (0, 0, 255)
+black = (0, 0, 0)
+
+#max screen size
+max_height = 600
+max_width = 1600
+
+#variables for rule loops
+
+#creating the rules = all possible combination of Bs
+x = [True, False]
+rules_tuple = [p for p in itertools.product(x, repeat=3)]
+total_rules = len(rules_tuple)
+rules = []
+for i in range(0, total_rules):
+    rules.append(list(rules_tuple[i]))
+
+#Defining Rules and if their outcome should give Alive (True) or Dead (False)
+set_rules = 0
+outcomes = [True] * total_rules
+
+
+#function to translates Bs in Deads and Alives
+def translatebools(list):
+    translation = []
+    for b in list:
+        translation.append("Alive" if b else "Dead")
+    print(translation)
+
+#introducing the user
+print("Welcome to the 1d Cellular Automaton Matrix")
+print("This software allows you to simulate any 1 Dimensional Automaton!")
+print("You will be asked to set the colors and size for the Automaton and its Cells")
+
+
+
+#Asking the user to set size of the screen (width)
+width_size = True
+print("Let's set some dimensions!")
+
+while width_size:
+    width = input("What should be width in pixels? ")
+    try:
+        width = int(width)
+        if 0 <= width <= max_width:
+                width_size = False
+        else:
+            print(f"You must provide a value between 0 and {max_width}")
+    except ValueError:
+        print("You must provide a value between 0 and {max_width}")
+
+#Asking the user to set size of the screen (height)
+height_size = True
+
+while height_size:
+    height = input("What should be height in pixels?")
+    try:
+        height = int(height)
+        if 0 <= height <= max_height:
+            height_size = False
+        else:
+            print(f"You must provide a value between 0 and {max_height}")
+    except ValueError:
+        print(f"You must provide a value between 0 and {max_height}")
+
+#Asking the user to set size of the Cells
+cell_size = True
+while cell_size:
+    cell = input("The Cells will be squares: How many pixel long should their side be? ")
+    try:
+        cell = int(cell)
+        if 0 <= cell <= width:
+            cell_size = False
+        else:
+            print(f"You must provide a value between 0 and {width}")
+    except ValueError:
+        print(f"You must provide a value between 0 and {width}")
+
+#useful variable for further functions
+number_of_cells = int(width / cell)
+
+
+
+#Asking the user the density of life in the the first line
+starting = True
+print("Let's set the density of life at the very first stage of the Automaton!")
+while starting:
+    alive_cells = input("What should be the % of life in the first line?")
+    try:
+        alive_cells = int(alive_cells)
+        if 0 <= alive_cells <= 100:
+            density_of_alive_cells = int((alive_cells * width)/100)
+            print(density_of_alive_cells)
+            beginning = [True] * density_of_alive_cells + [False] * (number_of_cells - density_of_alive_cells)
+            starting = False
+        else:
+            print("You must provide a value between 0 and 100")
+    except ValueError:
+        print("You must provide a value between 0 and 100")
+
+random.shuffle(beginning)
+
+
+#Asking the user to choose colors for the Automaton
+print("Great! now choose a color for the Alive cells and one for the Dead cells")
+print("Type 'W' for White, 'R' for Red, 'G' for Green, 'U' for Blue, 'B' for Black ")
+choosing_cell_color = True
+while choosing_cell_color:
+    choosing_cell_color = False
+    cell_color = input("what color should life be?")
+    if cell_color == "W":
+        c_color = white
+    elif cell_color == "U":
+        c_color = blue
+    elif cell_color == "G":
+        c_color = green
+    elif cell_color == "R":
+        c_color = red
+    elif cell_color == "B":
+        c_color = black
+    else:
+        print("type 'W' or 'R' or 'G' or 'U' or 'B' ")
+        choosing_cell_color = True
+
+choosing_death_color = True
+while choosing_death_color:
+    choosing_death_color = False
+    death_color = input("what color should dead cells be?")
+    if death_color == "W":
+        d_color = white
+    elif death_color == "U":
+        d_color = blue
+    elif death_color == "G":
+        d_color = green
+    elif death_color == "R":
+        d_color = red
+    elif cell_color == "B":
+        d_color = black
+    else:
+        print("type 'W' or 'R' or 'G' or 'U' or 'B' ")
+        choosing_death_color = True
+
+#Asking the user to set the outcomes for the combinations of Bs
+while set_rules != total_rules:
+    print("Choose the outcome for every triplet. Type 'D' for Dead and 'A' for Alive")
+    for i in range(0, total_rules):
+        while i == set_rules:
+            translatebools(rules[i])
+            rule = input("the outcome should be: ")
+            if rule == "A":
+                outcomes[i] = True
+                set_rules = set_rules + 1
+            elif rule == "D":
+                outcomes[i] = False
+                set_rules = set_rules + 1
+            else:
+                print("type 'D' for Dead or 'A' for Alive")
+
+
+print("Great! now let's simulate life!")
+
+# creating the screen
+
+screen = pygame.display.set_mode((width, height))
+pygame.display.set_caption("1 Dimensional Cellular Automaton")
+
+#Setting variables necessary for the loop to work
+beginning_2 = [False] * number_of_cells
+line = 0
+alive = True
+running = True
+
+#Main Loop
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+    #Automaton writing loop
+    while alive:
+        if line == height:
+            alive = False
+        for i in range(1, (number_of_cells - 1)):
+            for s in range(0, total_rules):
+                current_state = [beginning[i-1], beginning[i], beginning[i+1]]
+                rule_number = rules.index(current_state)
+                if outcomes[rule_number]:
+                    beginning_2[i] = False
+                    pygame.draw.rect(screen, (d_color), ((i * cell), (line * cell), cell, cell))
+                else:
+                    beginning_2[i] = True
+                    pygame.draw.rect(screen, (c_color), ((i * cell), (line * cell), cell, cell))
+
+
+        pygame.display.update()
+
+        #Loop reset, each loop determines 1 generation
+        line = line + 1
+        beginning = beginning_2
+        beginning_2 = [False] * number_of_cells
+pygame.quit
+
